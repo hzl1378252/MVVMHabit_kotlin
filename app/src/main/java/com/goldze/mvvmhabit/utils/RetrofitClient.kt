@@ -51,6 +51,7 @@ class RetrofitClient private constructor(url: String = baseUrl, headers: Map<Str
         val instance: RetrofitClient = SingletonHolder.INSTANCE
 
     }
+
     private var cache: Cache? = null
     private var httpCacheDirectory: File? = null
 
@@ -117,6 +118,23 @@ class RetrofitClient private constructor(url: String = baseUrl, headers: Map<Str
         }
         return retrofit.create(service)
     }
+    /**
+     * execute your customer API
+     * For example:
+     * MyApiService service =
+     * RetrofitClient.getInstance(MainActivity.this).create(MyApiService.class);
+     * <p>
+     * RetrofitClient.getInstance(MainActivity.this)
+     * .execute(service.lgon("name", "password"), subscriber)
+     * * @param subscriber
+     */
+    fun <T> execute(observable: Observable<T>, subscriber: Observer<T>): T? {
+        observable.subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(subscriber)
 
+        return null
+    }
 }
 

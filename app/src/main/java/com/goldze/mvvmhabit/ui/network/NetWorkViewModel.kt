@@ -80,9 +80,7 @@ class NetWorkViewModel(application: Application) : BaseViewModel(application) {
                     uc.finishLoadmore.set(!uc.finishLoadmore.get())
                     //模拟一部分假数据
                     for (i in 0..9) {
-                        val item = ItemsEntity()
-                        item.setId(-1)
-                        item.setName("模拟条目" + itemIndex++)
+                        val item = ItemsEntity(1, "模拟条目" + itemIndex++)
                         val itemViewModel = NetWorkItemViewModel(this@NetWorkViewModel, item)
                         //双向绑定动态添加Item
                         observableList!!.add(itemViewModel)
@@ -106,61 +104,84 @@ class NetWorkViewModel(application: Application) : BaseViewModel(application) {
                 .compose(RxUtils.bindToLifecycle(lifecycleProvider)) //请求与View周期同步
                 .compose(RxUtils.schedulersTransformer()) //线程调度
                 .compose(RxUtils.exceptionTransformer()) // 网络错误的异常转换, 这里可以换成自己的ExceptionHandle
-                .doOnSubscribe(Consumer<Disposable> { showDialog("正在请求...") })
-                .subscribe(Consumer<BaseResponse<DemoEntity>> { response ->
-                    itemIndex = 0
-                    //清除列表
-                    observableList!!.clear()
-                    //请求成功
-                    if (response.code == 1) {
-                        //将实体赋给LiveData
-                        for (entity in response.result.items) {
-                            val itemViewModel = NetWorkItemViewModel(this@NetWorkViewModel, entity)
-                            //双向绑定动态添加Item
-                            observableList!!.add(itemViewModel)
+                .doOnSubscribe {
+                    showDialog("正在请求...")
+                }
+                .subscribe(object :Consumer<BaseResponse<DemoEntity>> {
+                    override fun accept(t: BaseResponse<DemoEntity>?) {
+                             itemIndex = 0
+                        //清除列表
+                        observableList?.clear()
+                        t?.run{//如果可为空 也可以用with  不建议用！！ 会报kotlin
+                            if (code == 1 ) {
+                                //将实体赋给LiveData
+                                result?.items?.forEach {
+                                    val itemViewModel = com.goldze.mvvmhabit.ui.network.NetWorkItemViewModel(this@NetWorkViewModel, it)
+                                    //双向绑定动态添加Item
+                                    observableList!!.add(itemViewModel)
+                                }
+
+                            }else{
+                                //code错误时也可以定义Observable回调到View层去处理
+                                me.goldze.mvvmhabit.utils.ToastUtils.showShort("数据错误")
+                            }
                         }
-                    } else {
-                        //code错误时也可以定义Observable回调到View层去处理
-                        ToastUtils.showShort("数据错误")
                     }
-                }, Consumer<ResponseThrowable> { throwable ->
-                    //关闭对话框
-                    dismissDialog()
-                    //请求刷新完成收回
-                    uc.finishRefreshing.set(!uc.finishRefreshing.get())
-                    ToastUtils.showShort(throwable.message)
-                    throwable.printStackTrace()
-                }, Action {
-                    //关闭对话框
-                    dismissDialog()
-                    //请求刷新完成收回
-                    uc.finishRefreshing.set(!uc.finishRefreshing.get())
+
                 })
-    }
+                }
+//    Consumer<BaseResponse<DemoEntity>> { response ->
+//        itemIndex = 0
+//        //清除列表
+//        observableList!!.clear()
+//        //请求成功
+//        if (response.code == 1) {
+//            //将实体赋给LiveData
+//            for (entity in response.result.items) {
+//                val itemViewModel = NetWorkItemViewModel(this@NetWorkViewModel, entity)
+//                //双向绑定动态添加Item
+//                observableList!!.add(itemViewModel)
+//            }
+//        } else {
+//            //code错误时也可以定义Observable回调到View层去处理
+//            ToastUtils.showShort("数据错误")
+//        }
+//    }, Consumer<ResponseThrowable> { throwable ->
+//        //关闭对话框
+//        dismissDialog()
+//        //请求刷新完成收回
+//        uc.finishRefreshing.set(!uc.finishRefreshing.get())
+//        ToastUtils.showShort(throwable.message)
+//        throwable.printStackTrace()
+//    }, Action {
+//        //关闭对话框
+//        dismissDialog()
+//        //请求刷新完成收回
+//        uc.finishRefreshing.set(!uc.finishRefreshing.get())
+//    }
+                        /**
+                         * 删除条目
+                         *
+                         * @param netWorkItemViewModel
+                         */
+                        fun deleteItem (netWorkItemViewModel: NetWorkItemViewModel) {
+            //点击确定，在 observableList 绑定中删除，界面立即刷新
+            observableList!!.remove(netWorkItemViewModel)
+        }
 
-    /**
-     * 删除条目
-     *
-     * @param netWorkItemViewModel
-     */
-    fun deleteItem(netWorkItemViewModel: NetWorkItemViewModel) {
-        //点击确定，在 observableList 绑定中删除，界面立即刷新
-        observableList!!.remove(netWorkItemViewModel)
-    }
+        /**
+         * 获取条目下标
+         *
+         * @param netWorkItemViewModel
+         * @return
+         */
+        fun getPosition(netWorkItemViewModel: NetWorkItemViewModel): Int {
+            return observableList!!.indexOf(netWorkItemViewModel)
+        }
 
-    /**
-     * 获取条目下标
-     *
-     * @param netWorkItemViewModel
-     * @return
-     */
-    fun getPosition(netWorkItemViewModel: NetWorkItemViewModel): Int {
-        return observableList!!.indexOf(netWorkItemViewModel)
+        override fun onDestroy() {
+            super.onDestroy()
+            observableList!!.clear()
+            observableList = null
+        }
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        observableList!!.clear()
-        observableList = null
-    }
-}
