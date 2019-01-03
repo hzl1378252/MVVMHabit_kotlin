@@ -26,17 +26,25 @@ class DemoViewModel(application: Application) : BaseViewModel(application) {
     var loadUrl: MutableLiveData<String> = MutableLiveData()
 
     //网络访问点击事件
-    var netWorkClick = BindingCommand<DemoViewModel>(BindingAction { startContainerActivity(NetWorkFragment::class.java.canonicalName) })
+    var netWorkClick = BindingCommand<DemoViewModel>(BindingAction {
+        startContainerActivity(NetWorkFragment::class.java.canonicalName)
+    })
     //进入TabBarActivity
-    var startTabBarClick = BindingCommand<DemoViewModel>(BindingAction { startActivity(TabBarActivity::class.java) })
+    var startTabBarClick = BindingCommand<DemoViewModel>(BindingAction {
+        startActivity(TabBarActivity::class.java) }
+    )
     //ViewPager绑定
-    var viewPagerBindingClick = BindingCommand<DemoViewModel>(BindingAction { startActivity(ViewPagerActivity::class.java) })
+    var viewPagerBindingClick = BindingCommand<DemoViewModel>(BindingAction {
+        startActivity(ViewPagerActivity::class.java)
+    })
     //表单提交点击事件
-    var formSbmClick = BindingCommand<DemoViewModel>(BindingAction { startContainerActivity(FormFragment::class.java.canonicalName) })
+    var formSbmClick = BindingCommand<DemoViewModel>(BindingAction {
+        startContainerActivity(FormFragment::class.java.canonicalName)
+    })
     //表单修改点击事件
     var formModifyClick = BindingCommand<DemoViewModel>(BindingAction {
         //模拟一个修改的实体数据
-        val entity :FormEntity= FormEntity("12345678","goldze","1","xxxx年xx月xx日",true)
+        val entity :FormEntity= FormEntity("12345678","goldze","1","xxxx年xx月xx日","",true)
 //        entity.id = "12345678"
 //        entity.name = "goldze"
 //        entity.sex = "1"

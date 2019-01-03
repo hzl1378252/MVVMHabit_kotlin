@@ -1,6 +1,7 @@
 package com.goldze.mvvmhabit.ui.main
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.arch.lifecycle.Observer
 import android.content.Context
@@ -48,12 +49,13 @@ class DemoActivity : BaseActivity<ActivityDemoBinding, DemoViewModel>() {
     /**
      * 请求相机权限
      */
+    @SuppressLint("CheckResult")
     private fun requestCameraPermissions() {
         //请求打开相机权限
         val rxPermissions = RxPermissions(this@DemoActivity)
         rxPermissions.request(Manifest.permission.CAMERA)
-                .subscribe { aBoolean ->
-                    if (aBoolean!!) {
+                .subscribe {
+                    if (it) {
                         ToastUtils.showShort("相机权限已经打开，直接跳入相机")
                     } else {
                         ToastUtils.showShort("权限被拒绝")

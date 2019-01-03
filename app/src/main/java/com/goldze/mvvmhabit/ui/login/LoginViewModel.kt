@@ -43,8 +43,8 @@ class LoginViewModel(application: Application) : BaseViewModel(application) {
         uc.pSwitchObservable.set(!uc.pSwitchObservable.get())
     })
     //用户名输入框焦点改变的回调事件
-    var onFocusChangeCommand = BindingCommand(BindingConsumer<Boolean> { hasFocus ->
-        if (hasFocus!!) {
+    var onFocusChangeCommand = BindingCommand(BindingConsumer<Boolean> {
+        if (it) {
             clearBtnVisibility.set(View.VISIBLE)
         } else {
             clearBtnVisibility.set(View.INVISIBLE)
@@ -62,11 +62,11 @@ class LoginViewModel(application: Application) : BaseViewModel(application) {
      * 网络模拟一个登陆操作
      */
     private fun login() {
-        if (TextUtils.isEmpty(userName.get())) {
+        if (userName.get().isNullOrEmpty()) {
             ToastUtils.showShort("请输入账号！")
             return
         }
-        if (TextUtils.isEmpty(password.get())) {
+        if (password.get().isNullOrEmpty()) {
             ToastUtils.showShort("请输入密码！")
             return
         }

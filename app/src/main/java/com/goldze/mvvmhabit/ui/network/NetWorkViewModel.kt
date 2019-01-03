@@ -1,5 +1,6 @@
 package com.goldze.mvvmhabit.ui.network
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.arch.lifecycle.MutableLiveData
 import android.databinding.ObservableArrayList
@@ -98,6 +99,7 @@ class NetWorkViewModel(application: Application) : BaseViewModel(application) {
     /**
      * 网络请求方法，在ViewModel中调用，Retrofit+RxJava充当Repository，即可视为Model层
      */
+    @SuppressLint("CheckResult")
     fun requestNetWork() {
         RetrofitClient.instance.create(DemoApiService::class.java)
                 .demoGet()
@@ -107,13 +109,13 @@ class NetWorkViewModel(application: Application) : BaseViewModel(application) {
                 .doOnSubscribe {
                     showDialog("正在请求...")
                 }
-                .subscribe(object :Consumer<BaseResponse<DemoEntity>> {
+                .subscribe(object : Consumer<BaseResponse<DemoEntity>> {
                     override fun accept(t: BaseResponse<DemoEntity>?) {
-                             itemIndex = 0
+                        itemIndex = 0
                         //清除列表
                         observableList?.clear()
-                        t?.run{//如果可为空 也可以用with  不建议用！！ 会报kotlin
-                            if (code == 1 ) {
+                        t?.run {
+                            if (code == 1) {
                                 //将实体赋给LiveData
                                 result?.items?.forEach {
                                     val itemViewModel = com.goldze.mvvmhabit.ui.network.NetWorkItemViewModel(this@NetWorkViewModel, it)
@@ -121,67 +123,47 @@ class NetWorkViewModel(application: Application) : BaseViewModel(application) {
                                     observableList!!.add(itemViewModel)
                                 }
 
-                            }else{
+                            } else {
                                 //code错误时也可以定义Observable回调到View层去处理
                                 me.goldze.mvvmhabit.utils.ToastUtils.showShort("数据错误")
                             }
                         }
                     }
 
+                },object :Consumer<ResponseThrowable> {
+                    override fun accept(t: ResponseThrowable?) {
+                        dismissDialog()
+                        //请求刷新完成收回
+                        uc.finishRefreshing.set(!uc.finishRefreshing.get())
+                        ToastUtils.showShort(t?.message)
+                        t?.printStackTrace()
+                    }
                 })
-                }
-//    Consumer<BaseResponse<DemoEntity>> { response ->
-//        itemIndex = 0
-//        //清除列表
-//        observableList!!.clear()
-//        //请求成功
-//        if (response.code == 1) {
-//            //将实体赋给LiveData
-//            for (entity in response.result.items) {
-//                val itemViewModel = NetWorkItemViewModel(this@NetWorkViewModel, entity)
-//                //双向绑定动态添加Item
-//                observableList!!.add(itemViewModel)
-//            }
-//        } else {
-//            //code错误时也可以定义Observable回调到View层去处理
-//            ToastUtils.showShort("数据错误")
-//        }
-//    }, Consumer<ResponseThrowable> { throwable ->
-//        //关闭对话框
-//        dismissDialog()
-//        //请求刷新完成收回
-//        uc.finishRefreshing.set(!uc.finishRefreshing.get())
-//        ToastUtils.showShort(throwable.message)
-//        throwable.printStackTrace()
-//    }, Action {
-//        //关闭对话框
-//        dismissDialog()
-//        //请求刷新完成收回
-//        uc.finishRefreshing.set(!uc.finishRefreshing.get())
-//    }
-                        /**
-                         * 删除条目
-                         *
-                         * @param netWorkItemViewModel
-                         */
-                        fun deleteItem (netWorkItemViewModel: NetWorkItemViewModel) {
-            //点击确定，在 observableList 绑定中删除，界面立即刷新
-            observableList!!.remove(netWorkItemViewModel)
-        }
-
-        /**
-         * 获取条目下标
-         *
-         * @param netWorkItemViewModel
-         * @return
-         */
-        fun getPosition(netWorkItemViewModel: NetWorkItemViewModel): Int {
-            return observableList!!.indexOf(netWorkItemViewModel)
-        }
-
-        override fun onDestroy() {
-            super.onDestroy()
-            observableList!!.clear()
-            observableList = null
-        }
     }
+
+    /**
+     * 删除条目
+     *
+     * @param netWorkItemViewModel
+     */
+    fun deleteItem(netWorkItemViewModel: NetWorkItemViewModel) {
+        //点击确定，在 observableList 绑定中删除，界面立即刷新
+        observableList!!.remove(netWorkItemViewModel)
+    }
+
+    /**
+     * 获取条目下标
+     *
+     * @param netWorkItemViewModel
+     * @return
+     */
+    fun getPosition(netWorkItemViewModel: NetWorkItemViewModel): Int {
+        return observableList!!.indexOf(netWorkItemViewModel)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        observableList!!.clear()
+        observableList = null
+    }
+}

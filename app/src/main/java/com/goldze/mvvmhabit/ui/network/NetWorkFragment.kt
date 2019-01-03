@@ -54,7 +54,7 @@ class NetWorkFragment : BaseFragment<FragmentNetworkBinding, NetWorkViewModel>()
         viewModel.deleteItemLiveData.observe(this, Observer { netWorkItemViewModel ->
             val index = netWorkItemViewModel?.let { viewModel.getPosition(it) }
             //删除选择对话框
-            MaterialDialogUtils.showBasicDialog(context, "提示", "是否删除【" + netWorkItemViewModel?.entity?.get().getName() + "】？ 列表索引值：" + index)
+            MaterialDialogUtils.showBasicDialog(context, "提示", "是否删除【" + netWorkItemViewModel?.entity?.get()?.name + "】？ 列表索引值：" + index)
                     .onNegative { dialog, which ->
                         ToastUtils.showShort("取消")
                     }.onPositive {

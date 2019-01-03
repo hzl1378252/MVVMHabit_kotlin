@@ -15,7 +15,7 @@ class FormEntity  (//添加默認參數 不需要的时候可以不传入
     var bir: String?="",
     var hobby: String?="",
     var marry: Boolean?=false
-) : Parcelable {
+) :BaseObservable(), Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readString(),
             parcel.readString(),

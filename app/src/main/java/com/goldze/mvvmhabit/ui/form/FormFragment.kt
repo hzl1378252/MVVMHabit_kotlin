@@ -31,9 +31,8 @@ class FormFragment : BaseFragment<FragmentFormBinding, FormViewModel>() {
 
     override fun initParam() {
         //获取列表传入的实体
-        val mBundle = arguments
-        if (mBundle != null) {
-            entity = mBundle.getParcelable("entity")
+        arguments?.let {
+            entity =it.getParcelable("entity")
         }
     }
 
@@ -52,12 +51,12 @@ class FormFragment : BaseFragment<FragmentFormBinding, FormViewModel>() {
         viewModel.setFormEntity(entity)
         //创建TitleViewModel
         val titleViewModel = createViewModel(this, TitleViewModel::class.java)
-        viewModel.setTitleViewModel(titleViewModel)
+        viewModel.setTitle(titleViewModel)
     }
 
     override fun initViewObservable() {
         //监听日期选择
-        viewModel.uc.showDateDialogObservable.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
+        viewModel.uc?.showDateDialogObservable?.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
             override fun onPropertyChanged(sender: Observable, propertyId: Int) {
                 val calendar = Calendar.getInstance()
                 val year = calendar.get(Calendar.YEAR)

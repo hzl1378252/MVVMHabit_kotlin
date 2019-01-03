@@ -26,7 +26,7 @@ class NetWorkItemViewModel(viewModel: NetWorkViewModel, entity: ItemsEntity) : I
     //条目的点击事件
     var itemClick = BindingCommand<NetWorkItemViewModel>(BindingAction {
         //这里可以通过一个标识,做出判断，已达到跳入不同界面的逻辑
-        if (entity.id=== -1) {
+        if (entity.id === -1) {
             ToastUtils.showShort(entity.name)
         } else {
             //跳转到详情界面,传入条目的实体对象
@@ -60,3 +60,4 @@ class NetWorkItemViewModel(viewModel: NetWorkViewModel, entity: ItemsEntity) : I
     //        }
     //    });
 }
+

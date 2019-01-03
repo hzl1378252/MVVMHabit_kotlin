@@ -40,30 +40,5 @@ class AppApplication : BaseApplication() {
                 .apply()
     }
 
-    fun getXiaoMing() {
-        val xiaoming = Person("xiaoming", 25)
-        with(xiaoming) {
-            val name = name
-        }
-        xiaoming.run {
-            val name = name
-        }
-    }
 
-    fun getXiaoMing1() {
-        var xiaoming: Person? = null
-        xiaoming = Person("xiaoming", 25)
-        with(xiaoming) {
-            val name = this?.name
-        }
-        or
-        with(xiaoming!!) {
-            val name = this.name
-        }
-        xiaoming?.run {
-            val name = name
-        }
-    }
-
-    data class Person(val name: String?, val age: Int?)
 }

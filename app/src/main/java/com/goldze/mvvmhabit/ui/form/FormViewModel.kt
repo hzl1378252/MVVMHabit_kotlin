@@ -36,14 +36,19 @@ class FormViewModel(application: Application) : BaseViewModel(application) {
     lateinit var titleViewModel: TitleViewModel
 
     //性别选择的监听
-    var onSexSelectorCommand = BindingCommand(BindingConsumer<IKeyAndValue> { iKeyAndValue -> entity!!.sex = iKeyAndValue.value })
+    var onSexSelectorCommand = BindingCommand(BindingConsumer<IKeyAndValue> {
+        //只有一个参数 可以用it代替
+        entity?.sex = it.value
+    })
     //生日选择的监听
     var onBirClickCommand = BindingCommand<FormViewModel>(BindingAction {
         //回调到view层(Fragment)中显示日期对话框
-        uc!!.showDateDialogObservable.set(!uc!!.showDateDialogObservable.get())
+        uc?.let {
+            it.showDateDialogObservable.set(!uc?.showDateDialogObservable!!.get())
+        }
     })
     //是否已婚Switch点状态改变回调
-    var onMarryCheckedChangeCommand = BindingCommand(BindingConsumer<Boolean> { isChecked -> entity!!.marry = isChecked })
+    var onMarryCheckedChangeCommand = BindingCommand(BindingConsumer<Boolean> { isChecked -> entity?.marry = isChecked })
     //提交按钮点击事件
     var onCmtClickCommand = BindingCommand<FormViewModel>(BindingAction {
         val submitJson = Gson().toJson(entity)
@@ -61,8 +66,8 @@ class FormViewModel(application: Application) : BaseViewModel(application) {
         uc = UIChangeObservable()
         //sexItemDatas 一般可以从本地Sqlite数据库中取出数据字典对象集合，让该对象实现IKeyAndValue接口
         sexItemDatas = ArrayList()
-        sexItemDatas!!.add(SpinnerItemData("男", "1"))
-        sexItemDatas!!.add(SpinnerItemData("女", "2"))
+        sexItemDatas?.add(SpinnerItemData("男", "1"))
+        sexItemDatas?.add(SpinnerItemData("女", "2"))
     }
 
     fun setTitle(titleViewModel: TitleViewModel) {//因为kt语言会帮你自动生成属性的get set方法  所以不能直接命名setTitleViewModel
@@ -70,7 +75,7 @@ class FormViewModel(application: Application) : BaseViewModel(application) {
         //初始化标题栏
         titleViewModel.rightTextVisibility.set(View.VISIBLE)
         titleViewModel.rightText.set("更多")
-        if (TextUtils.isEmpty(entity!!.id)) {
+        if (entity?.id.isNullOrEmpty()) {
             //ID为空是新增
             titleViewModel.titleText.set("表单提交")
         } else {
@@ -78,7 +83,9 @@ class FormViewModel(application: Application) : BaseViewModel(application) {
             titleViewModel.titleText.set("表单编辑")
         }
         //右边文字的点击事件
-        titleViewModel.rightTextOnClickCommand = BindingCommand(BindingAction { ToastUtils.showShort("更多") })
+        titleViewModel.rightTextOnClickCommand = BindingCommand(BindingAction {
+            ToastUtils.showShort("更多")
+        })
     }
 
     fun setFormEntity(entity: FormEntity) {
@@ -87,16 +94,18 @@ class FormViewModel(application: Application) : BaseViewModel(application) {
 
     fun setBir(year: Int, month: Int, dayOfMonth: Int) {
         //设置数据到实体中，自动刷新界面
-        entity!!.bir = year.toString() + "年" + (month + 1) + "月" + dayOfMonth + "日"
         //刷新实体,驱动界面更新
-        entity!!.notifyChange()
+        entity?.run {
+            bir = year.toString() + "年" + (month + 1) + "月" + dayOfMonth + "日"
+            this.notifyChange()
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         entity = null
         uc = null
-        sexItemDatas!!.clear()
+        sexItemDatas?.clear()
         sexItemDatas = null
     }
 }

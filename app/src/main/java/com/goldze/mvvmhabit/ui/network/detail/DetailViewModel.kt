@@ -13,14 +13,16 @@ import me.goldze.mvvmhabit.base.BaseViewModel
  */
 
 class DetailViewModel(application: Application) : BaseViewModel(application) {
-    var entity: ObservableField<ItemsEntity>? = ObservableField()
-
+    var entity : ObservableField<ItemsEntity>? = ObservableField()
+    //    var entity  = ObservableField<ItemsEntity>()
     fun setDemoEntity(entity: ItemsEntity) {
         this.entity?.set(entity)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        entity = null
+        entity
+        entity=null//会提示此值不可为null  ？可为null
+
     }
 }

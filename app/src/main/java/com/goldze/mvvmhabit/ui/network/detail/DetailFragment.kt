@@ -19,12 +19,11 @@ import me.goldze.mvvmhabit.base.BaseFragment
 
 class DetailFragment : BaseFragment<FragmentDetailBinding, DetailViewModel>() {
 
-    private lateinit var  entity:ItemsEntity
+    private lateinit var entity: ItemsEntity
     override fun initParam() {
         //获取列表传入的实体
-        val mBundle = arguments
-        if (mBundle != null) {
-            entity = mBundle.getParcelable("entity")
+        arguments?.let {
+            entity = it.getParcelable("entity")
         }
     }
 
